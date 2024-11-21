@@ -10,6 +10,15 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.cinemachine": {
+      "version": "3.1.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.splines": "2.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.collab-proxy": {
       "version": "2.5.2",
       "depth": 0,
@@ -44,7 +53,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.feature.development": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
@@ -58,7 +67,7 @@
     },
     "com.unity.ide.rider": {
       "version": "3.0.31",
-      "depth": 0,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6"
@@ -72,13 +81,6 @@
       "dependencies": {
         "com.unity.test-framework": "1.1.9"
       },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.ide.vscode": {
-      "version": "1.2.4",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.mathematics": {
@@ -198,6 +200,17 @@
         "com.unity.searcher": "4.9.2"
       }
     },
+    "com.unity.splines": {
+      "version": "2.6.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.settings-manager": "1.0.3"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.terrain-tools": {
       "version": "5.1.2",
       "depth": 0,
@@ -278,7 +291,7 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.4",
+      "version": "1.9.5",
       "depth": 0,
       "source": "registry",
       "dependencies": {
