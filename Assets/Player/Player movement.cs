@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class UnityExampleCharMover : MonoBehaviour {
+public class CharMover : MonoBehaviour {
     public CharacterController controller;
     private float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
     [SerializeField] int speed = 5;
     float turner;
+    LineScript ol;
 
     private void Start() {
         controller = gameObject.GetComponent<CharacterController>();
@@ -22,9 +23,27 @@ public class UnityExampleCharMover : MonoBehaviour {
             }
         }
         if (Input.GetMouseButtonDown(0)) {
-            if (Physics.Raycast(Camera.ScreenToWorldPoint(Input.mousePosition), out RaycastHit hit){
-                Console.WriteLine("work on it");
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) {
+                if (hit.transform.name.Contains("Soldier")) {
+                    ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
+                }
+                else {
+                    if (ol != null) {
+                        ol.selected = false;
+                        ol = null;
+                    }
+                }
             }
+            else{
+                if (ol != null) {
+                    ol.selected = false;
+                    ol = null;
+                }
+            }
+        }
+        if (Input.GetMouseButtonDown(1) && ol != null) {
+
         }
     }
     void FixedUpdate() {

@@ -229,6 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05183f404262ce4eabc181b963c3843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selected: 0
 --- !u!120 &185872021
 LineRenderer:
   serializedVersion: 2
@@ -517,8 +518,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 24658956}
   - {fileID: 185872019}
+  - {fileID: 24658956}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &424947220
@@ -794,7 +795,7 @@ GameObject:
   - component: {fileID: 979654221}
   - component: {fileID: 979654220}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Disk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1067,6 +1068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05183f404262ce4eabc181b963c3843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selected: 0
 --- !u!1 &1097732650
 GameObject:
   m_ObjectHideFlags: 0
