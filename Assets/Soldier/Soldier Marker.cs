@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class SoldierMarker : MonoBehaviour
 {
-    private SoldierMoveTomarker stm;
+    public SoldierMoveTomarker stm;
     LineScript ls;
+    public bool marking;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -15,6 +16,8 @@ public class SoldierMarker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (marking == false) {
+            stm.moving = true;
+        }
     }
 }

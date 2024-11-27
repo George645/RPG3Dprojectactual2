@@ -19,7 +19,23 @@ public class LineScript : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        Debug.Log(unitWidth);
+        if (Input.GetMouseButton(1) && selected) {
+            Debug.Log("hi");
+            int i = 0;
+            int j = 0;
+            foreach (SoldierMarker soldierMarker in soldierMarkerList) {
+                Debug.Log("moving marker");
+                soldierMarker.stm.moving = false;
+                soldierMarker.marking = true;
+                movement = new Vector3(lineStartposition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.3f, lineStartposition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
+                soldierMarker.transform.position = movement;
+                i++;
+                if (i > unitWidth - 1) {
+                    j++;
+                    i = 0;
+                }
+            }
+        }
         if (Input.GetMouseButtonUp(1) && selected) {
             int i = 0;
             int j = 0;
@@ -27,7 +43,7 @@ public class LineScript : MonoBehaviour
             lineRowDirection = lr.GetPosition(1) - lr.GetPosition(0);
             lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
             foreach (SoldierMarker soldierMarker in soldierMarkerList) {
-                movement = new Vector3(lineStartposition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 21f, lineStartposition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
+                movement = new Vector3(lineStartposition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.3f, lineStartposition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
                 soldierMarker.transform.position = movement;
                 i++;
                 if (i > unitWidth - 1) {

@@ -5,7 +5,8 @@ using UnityEngine;
 public class SoldierMoveTomarker : MonoBehaviour
 {
     SoldierMarker sm;
-    Vector3 movement;
+    Vector3 movement, endPosition;
+    public bool moving;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -13,16 +14,21 @@ public class SoldierMoveTomarker : MonoBehaviour
     }
 
     // Update is called once per frame
+    private void Update() {
+        if (moving) {
+            Debug.Log(moving);
+            endPosition = sm.transform.position;
+        }
+    }
     void FixedUpdate()
     {
         this.transform.position = new Vector3(transform.position.x, 20f, transform.position.z);
-        if (Math.Abs(sm.transform.position.x - transform.position.x) > 0 || Math.Abs(sm.transform.position.y - transform.position.y) > 0) {
-            movement = new Vector3((sm.transform.position.x - this.transform.position.x), 0f, sm.transform.position.z - this.transform.position.z);
+        if (Math.Abs(endPosition.x - transform.position.x) > 0 || Math.Abs(endPosition.y - transform.position.y) > 0) {
+            movement = new Vector3((endPosition.x - this.transform.position.x), 0f, endPosition.z - this.transform.position.z);
             if (movement.magnitude > 0.1) {
                 movement = movement.normalized /10;
             }
             else {
-                Debug.Log("need more lee way");
             }
             transform.position += movement;
             //Debug.Log(transform.position.magnitude + ", " + sm.transform.position.magnitude);

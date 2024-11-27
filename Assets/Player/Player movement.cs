@@ -1,7 +1,5 @@
 using System;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 
 public class CharMover : MonoBehaviour {
@@ -14,6 +12,7 @@ public class CharMover : MonoBehaviour {
     LineRenderer lr;
     Vector3 mousePosStart, mousePosEnd;
     int unitWidth;
+    LayerMask mask;
 
 
     private void Start() {
@@ -50,37 +49,41 @@ public class CharMover : MonoBehaviour {
                 }
             }
         }
-        Debug.Log(Math.Abs(mousePosStart.magnitude - mousePosEnd.magnitude));
-        if (Math.Abs(mousePosStart.magnitude - mousePosEnd.magnitude) <= 3) {
+        if (Vector3.Distance(mousePosStart, mousePosEnd) <= 3) {
             unitWidth = 3;
         }
-        else if (Math.Abs(mousePosStart.magnitude -  mousePosEnd.magnitude) <= 10){
-            unitWidth = (int)Math.Abs(mousePosStart.magnitude - mousePosEnd.magnitude);
+        else if (Vector3.Distance(mousePosStart, mousePosEnd) <= 10){
+            unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
         }
-        else if (Math.Abs(mousePosStart.magnitude - mousePosEnd.magnitude) >= 10) {
+        else if (Vector3.Distance(mousePosStart, mousePosEnd) >= 10) {
             unitWidth = 10;
         }
-        Debug.Log(unitWidth);
+        mask = LayerMask.GetMask("Default");
         if (Input.GetMouseButtonDown(1) && ol != null) {
             RaycastHit hit;
-            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
             mousePosStart = hit.point;
             foreach(SoldierMarker sm in ol.soldierMarkerList) {
                 sm.GetComponent<MeshRenderer>().enabled = true;
+                sm.marking = true;
+                sm.stm.moving = false;
             }
         }
         else if (Input.GetMouseButton(1) && ol != null) {
             RaycastHit hit;
-            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
             mousePosEnd = hit.point;
+            ol.unitWidth = unitWidth;
         }
         else if (Input.GetMouseButtonUp(1) && ol != null) {
             RaycastHit hit;
-            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
             mousePosEnd = hit.point;
             ol.unitWidth = unitWidth;
             foreach(SoldierMarker sm in ol.soldierMarkerList) {
                 sm.GetComponent<MeshRenderer>().enabled = false;
+                sm.marking = false;
+                sm.stm.moving = true;
             }
         }
     }
