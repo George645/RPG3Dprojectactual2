@@ -62,7 +62,8 @@ public class LineScript : MonoBehaviour
                 lineRowDirection = previousLineRowDirection;
             }
             foreach (SoldierMarker soldierMarker in soldierMarkerList) {
-                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
+                Math.DivRem(j, 2, out int result);
+                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j + result * 0.5f);
                 soldierMarker.transform.position = movement;
                 i++;
                 if (i > unitWidth - 1) {

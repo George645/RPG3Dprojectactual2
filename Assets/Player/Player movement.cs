@@ -13,12 +13,13 @@ public class CharMover : MonoBehaviour {
     int unitWidth;
     int mask;
     Vector3 previousDirection;
-
+    float turner;
 
     private void Start() {
         controller = gameObject.GetComponent<CharacterController>();
     }
     private void Update() {
+        turner = Input.GetAxis("Horizontal");
         if (Input.GetButtonDown("Jump") && groundedTimer > 0) {
             groundedTimer = 0;
             verticalVelocity += Mathf.Sqrt(jumpHeight * 2 * gravityValue);
@@ -30,6 +31,7 @@ public class CharMover : MonoBehaviour {
                 ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
                 ol.selected = true;
                 lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
+                Debug.Log("hit");
             }
             else{
                 if (ol != null) {
@@ -46,7 +48,7 @@ public class CharMover : MonoBehaviour {
         }
         if (ol != null){
             unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
-            unitWidth = Math.Clamp(unitWidth, ol.soldierMarkerList.Count / 30 + 2, ol.soldierMarkerList.Count / 3);
+            unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(ol.soldierMarkerList.Count), ol.soldierMarkerList.Count / 3);
             mask = LayerMask.GetMask("Default");
             if (Input.GetMouseButtonDown(1)) {
                 RaycastHit hit;
@@ -67,11 +69,11 @@ public class CharMover : MonoBehaviour {
                 RaycastHit hit;
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
                 mousePosEnd = hit.point;
-                if ((int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1) < ol.soldierMarkerList.Count / 30 + 2) {
+                if ((int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1) < (int)Math.Sqrt(ol.soldierMarkerList.Count)) {
                     mousePosStart -= previousDirection / 2;
                     mousePosEnd += previousDirection / 2;
                     unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
-                    unitWidth = Math.Clamp(unitWidth, ol.soldierMarkerList.Count / 30 + 2, ol.soldierMarkerList.Count / 3);
+                    unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(ol.soldierMarkerList.Count), ol.soldierMarkerList.Count / 3);
                 }
                 ol.unitWidth = unitWidth;
                 previousDirection = mousePosEnd - mousePosStart;
@@ -83,6 +85,9 @@ public class CharMover : MonoBehaviour {
         }
     }
     void FixedUpdate() {
+        if (Input.GetMouseButton(2)) {
+            transform.rotation = new Quaternion(0, 0, transform.rotation.z + turner/5, 0);
+        }
         try {
             if (mousePosStart != new Vector3() && mousePosEnd != new Vector3()) {
                 lr.SetPosition(0, mousePosStart);
