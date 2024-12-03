@@ -8,6 +8,7 @@ public class SoldierMoveTomarker : MonoBehaviour
     Vector3 movement;
     public Vector3 endPosition;
     public bool moving = true;
+    bool start = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start(){
         sm = this.transform.parent.GetChild(1).GetComponent<SoldierMarker>();
@@ -16,8 +17,10 @@ public class SoldierMoveTomarker : MonoBehaviour
 
     // Update is called once per frame
     private void Update() {
-        if (moving) {
+        //need something to run after start but before everything else, so used another variable that only lets it run once
+        if (moving || start) {
             endPosition = sm.transform.position;
+            start = false;
         }
     }
     void FixedUpdate(){

@@ -10,13 +10,48 @@ public class CharMover : MonoBehaviour {
     LineScript ol;
     LineRenderer lr;
     Vector3 mousePosStart, mousePosEnd;
-    int unitWidth;
-    int mask;
-    Vector3 previousDirection;
+    int unitWidth, mask, previousUnitWidth = 10;
     float turner;
 
     private void Start() {
         controller = gameObject.GetComponent<CharacterController>();
+    }
+    private void CheckIfClickingOnUnit() {
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit) && hit.transform.name.Contains("Soldier")) {
+            ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
+            ol.selected = true;
+            previousUnitWidth = ol.unitWidth;
+            Debug.Log(previousUnitWidth);
+            lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
+        }
+        else {
+            if (ol != null) {
+                foreach (SoldierMarker sm in ol.soldierMarkerList) {
+                    sm.marking = false;
+                    sm.transform.position = new Vector3(sm.stm.endPosition.x, 19, sm.stm.endPosition.z);
+                }
+                ol.selected = false;
+                ol = null;
+                lr = null;
+            }
+        }
+    }
+    private void GetUnitWidth() {
+        unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
+        if (unitWidth < 3) {
+            Debug.Log(previousUnitWidth);
+            unitWidth = previousUnitWidth;
+        }
+        else {
+            unitWidth = Math.Clamp(unitWidth, 3, ol.soldierMarkerList.Count / 3);
+        }
+    }
+    private void ShowMarkers(bool setTo) {
+        foreach (SoldierMarker soldierMarker in ol.soldierMarkerList) {
+            soldierMarker.GetComponent<MeshRenderer>().enabled = setTo;
+            soldierMarker.marking = setTo;
+        }
     }
     private void Update() {
         turner = Input.GetAxis("Horizontal");
@@ -26,38 +61,16 @@ public class CharMover : MonoBehaviour {
         }
 
         if (Input.GetMouseButtonDown(0)) {
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit) && hit.transform.name.Contains("Soldier")) {
-                ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
-                ol.selected = true;
-                lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
-                Debug.Log("hit");
-            }
-            else{
-                if (ol != null) {
-                    foreach (SoldierMarker sm in ol.soldierMarkerList) {
-                        sm.marking = false;
-                        sm.transform.position = new Vector3(sm.stm.endPosition.x, 19, sm.stm.endPosition.z);
-                        Debug.Log(sm.transform.position + " " + sm.stm.transform.position);
-                    }
-                    ol.selected = false;
-                    ol = null;
-                    lr = null;
-                }
-            }
+            CheckIfClickingOnUnit();
         }
         if (ol != null){
-            unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
-            unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(ol.soldierMarkerList.Count), ol.soldierMarkerList.Count / 3);
+            GetUnitWidth();
             mask = LayerMask.GetMask("Default");
             if (Input.GetMouseButtonDown(1)) {
                 RaycastHit hit;
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
                 mousePosStart = hit.point;
-                foreach (SoldierMarker sm in ol.soldierMarkerList) {
-                    sm.GetComponent<MeshRenderer>().enabled = true;
-                    sm.marking = true;
-                }
+                ShowMarkers(true);
             }
             else if (Input.GetMouseButton(1)) {
                 RaycastHit hit;
@@ -68,19 +81,10 @@ public class CharMover : MonoBehaviour {
             else if (Input.GetMouseButtonUp(1)) {
                 RaycastHit hit;
                 Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000f, mask);
-                mousePosEnd = hit.point;
-                if ((int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1) < (int)Math.Sqrt(ol.soldierMarkerList.Count)) {
-                    mousePosStart -= previousDirection / 2;
-                    mousePosEnd += previousDirection / 2;
-                    unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
-                    unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(ol.soldierMarkerList.Count), ol.soldierMarkerList.Count / 3);
-                }
                 ol.unitWidth = unitWidth;
-                previousDirection = mousePosEnd - mousePosStart;
-                foreach (SoldierMarker sm in ol.soldierMarkerList) {
-                    sm.GetComponent<MeshRenderer>().enabled = false;
-                    sm.marking = false;
-                }
+                mousePosEnd = hit.point;
+                previousUnitWidth = unitWidth;
+                ShowMarkers(false);
             }
         }
     }
