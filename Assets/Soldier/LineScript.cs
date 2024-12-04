@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEditor.PackageManager;
 
 public class LineScript : MonoBehaviour
 {
     public List<SoldierMarker> soldierMarkerList = new();
     public bool selected = false;
     public int unitWidth = 10;
-    int i = 0, j = 0, previousUnitWidth;
+    int rowNumber = 0, columnNumber = 0, previousUnitWidth;
     LineRenderer lr;
     Vector3 lineStartPosition, lineColumnDirection, lineRowDirection, movement, previousLineColumnDirection, previousLineRowDirection;
 
@@ -20,18 +21,30 @@ public class LineScript : MonoBehaviour
         lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
         foreach (SoldierMarker soldierMarker in soldierMarkerList) {
             soldierMarker.marking = true;
-            movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
+            Math.DivRem(columnNumber, 2, out int ColumnNumberDivRemainder);
+            movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * rowNumber + lineColumnDirection.normalized.x * columnNumber + lineRowDirection.normalized.x * 0.5f * ColumnNumberDivRemainder, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * rowNumber + lineColumnDirection.normalized.z * columnNumber + lineRowDirection.normalized.z * ColumnNumberDivRemainder * 0.5f);
             soldierMarker.transform.position = movement;
-            i++;
-            if (i > unitWidth - 1) {
-                j++;
-                i = 0;
+            rowNumber++;
+            if (rowNumber > unitWidth - 1) {
+                columnNumber++;
+                rowNumber = 0;
             }
         }
+        previousLineColumnDirection = lineColumnDirection;
+        previousLineRowDirection = lineRowDirection;
         previousUnitWidth = unitWidth;
     }
     public void AddMarker(SoldierMarker soldier) {
         soldierMarkerList.Add(soldier);
+    }
+    public void RemoveSoldier(SoldierMarker soldier) {
+        if (soldierMarkerList.Contains(soldier)) {
+            soldierMarkerList.Remove(soldier);
+        }
+        else {
+            throw new MissingComponentException("There was no soldier found in this unit");
+
+        }
     }
     private void Update() {
         lineStartPosition = lr.GetPosition(0);
@@ -42,39 +55,38 @@ public class LineScript : MonoBehaviour
             lineRowDirection = previousLineRowDirection;
             unitWidth = previousUnitWidth;
         }
-        Debug.Log(previousLineColumnDirection + " " + previousLineRowDirection);
         if (Input.GetMouseButtonUp(1) && selected) {
-            Debug.Log("HI");
             previousLineColumnDirection = lineColumnDirection;
             previousLineRowDirection = lineRowDirection;
             previousUnitWidth = unitWidth;
         }
     }
     void FixedUpdate() {
-        i = 0;
-        j = 0;
+        rowNumber = 0;
+        columnNumber = 0;
         lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
         if (Input.GetMouseButton(1) && selected) {
             foreach (SoldierMarker soldierMarker in soldierMarkerList) {
                 soldierMarker.marking = true;
-                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j);
+                Math.DivRem(columnNumber, 2, out int ColumnNumberDivRemainder);
+                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * rowNumber + lineColumnDirection.normalized.x * columnNumber + lineRowDirection.normalized.x * 0.5f * ColumnNumberDivRemainder, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * rowNumber + lineColumnDirection.normalized.z * columnNumber + lineRowDirection.normalized.z * ColumnNumberDivRemainder * 0.5f);
                 soldierMarker.transform.position = movement;
-                i++;
-                if (i > unitWidth - 1) {
-                    j++;
-                    i = 0;
+                rowNumber++;
+                if (rowNumber > unitWidth - 1) {
+                    columnNumber++;
+                    rowNumber = 0;
                 }
             }
         }
         if (Input.GetMouseButtonUp(1) && selected) {
             foreach (SoldierMarker soldierMarker in soldierMarkerList) {
-                Math.DivRem(j, 2, out int result);
-                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * i + lineColumnDirection.normalized.x * j, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * i + lineColumnDirection.normalized.z * j + result * 0.5f);
+                Math.DivRem(columnNumber, 2, out int ColumnNumberDivRemainder);
+                movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * rowNumber + lineColumnDirection.normalized.x * columnNumber + lineRowDirection.normalized.x * 0.5f * ColumnNumberDivRemainder, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * rowNumber + lineColumnDirection.normalized.z * columnNumber + lineRowDirection.normalized.z * ColumnNumberDivRemainder * 0.5f);
                 soldierMarker.transform.position = movement;
-                i++;
-                if (i > unitWidth - 1) {
-                    j++;
-                    i = 0;
+                rowNumber++;
+                if (rowNumber > unitWidth - 1) {
+                    columnNumber++;
+                    rowNumber = 0;
                 }
             }
             previousLineColumnDirection = lineColumnDirection;

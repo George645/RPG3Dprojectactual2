@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Detectplayer : MonoBehaviour
+public class PlayerAndSoldier : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

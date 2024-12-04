@@ -3,7 +3,7 @@ using UnityEngine;
 public class SoldierMarker : MonoBehaviour
 {
     public SoldierMoveTomarker stm;
-    LineScript ls;
+    public LineScript ls;
     public bool marking;
     void Awake(){
         stm = this.transform.parent.GetChild(0).GetComponent<SoldierMoveTomarker>();

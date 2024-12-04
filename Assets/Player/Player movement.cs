@@ -59,7 +59,6 @@ public class CharMover : MonoBehaviour {
             groundedTimer = 0;
             verticalVelocity += Mathf.Sqrt(jumpHeight * 2 * gravityValue);
         }
-
         if (Input.GetMouseButtonDown(0)) {
             CheckIfClickingOnUnit();
         }
