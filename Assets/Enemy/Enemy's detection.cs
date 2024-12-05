@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class detectionofenemyscript : MonoBehaviour{
     EnemyScript thisEnemy;
+    SphereCollider detectionRange;
     void Start(){
         thisEnemy = transform.parent.GetComponent<EnemyScript>();
+        detectionRange = GetComponent<SphereCollider>();
+        detectionRange.isTrigger = true;
     }
     private void OnTriggerEnter(Collider other) {
         if (other.GetComponent<PlayerAndSoldier>() != null) {

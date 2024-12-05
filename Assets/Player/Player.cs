@@ -1,9 +1,11 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 
 
-public class CharMover : MonoBehaviour {
+public class Player : MonoBehaviour {
     public CharacterController controller;
+    public Camera followingCamera;
     
     private float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
     [SerializeField] int speed = 5;
@@ -11,9 +13,27 @@ public class CharMover : MonoBehaviour {
     LineRenderer lr;
     Vector3 mousePosStart, mousePosEnd;
     int unitWidth, mask, previousUnitWidth = 10;
-    float turner;
+
+    float health = 100;
+    int maxHealth;
+    float healingCooldown = 0f;
+    float healingFactor = 0.2f;
+
+    double rotation;
+    double startZ = 10f;
+    double startX = 0f;
+    Vector3 startMousePosition;
+
+    public static Player instance;
 
     private void Start() {
+        if (instance == null) {
+            DontDestroyOnLoad(this.gameObject);
+            instance = this;
+        }
+        else {
+            Destroy(this.gameObject);
+        }
         controller = gameObject.GetComponent<CharacterController>();
     }
     private void CheckIfClickingOnUnit() {
@@ -22,7 +42,6 @@ public class CharMover : MonoBehaviour {
             ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
             ol.selected = true;
             previousUnitWidth = ol.unitWidth;
-            Debug.Log(previousUnitWidth);
             lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
         }
         else {
@@ -40,7 +59,6 @@ public class CharMover : MonoBehaviour {
     private void GetUnitWidth() {
         unitWidth = (int)Math.Round(Vector3.Distance(mousePosStart, mousePosEnd), 1);
         if (unitWidth < 3) {
-            Debug.Log(previousUnitWidth);
             unitWidth = previousUnitWidth;
         }
         else {
@@ -53,8 +71,24 @@ public class CharMover : MonoBehaviour {
             soldierMarker.marking = setTo;
         }
     }
+    private void Death() {
+        if (health < 0) {
+            Destroy(this.gameObject);
+        }
+    }
+    public void TakeDamage(float damage) {
+        health -= damage;
+        healingCooldown = 10;
+    }
     private void Update() {
-        turner = Input.GetAxis("Horizontal");
+        Death();
+        if (Input.GetMouseButtonDown(2)) {
+            startMousePosition = Input.mousePosition;
+        }
+        if (Input.GetMouseButton(2)) {
+            rotation = (Input.mousePosition.x - startMousePosition.x) / 10;
+            startMousePosition = Input.mousePosition;
+        }
         if (Input.GetButtonDown("Jump") && groundedTimer > 0) {
             groundedTimer = 0;
             verticalVelocity += Mathf.Sqrt(jumpHeight * 2 * gravityValue);
@@ -88,8 +122,12 @@ public class CharMover : MonoBehaviour {
         }
     }
     void FixedUpdate() {
-        if (Input.GetMouseButton(2)) {
-            transform.rotation = new Quaternion(0, 0, transform.rotation.z + turner/5, 0);
+        healingCooldown -= Time.deltaTime;
+        if (health < maxHealth && healingCooldown < 0f) {
+            health += healingFactor;
+        }
+        else if (health > maxHealth) {
+            health = maxHealth;
         }
         try {
             if (mousePosStart != new Vector3() && mousePosEnd != new Vector3()) {
@@ -115,7 +153,8 @@ public class CharMover : MonoBehaviour {
         }
         verticalVelocity -= gravityValue * Time.deltaTime;
 
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 move = new Vector3((followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Vertical") + (followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Horizontal"), 0, (followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Vertical") + (followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Horizontal"));
+        move = move.normalized;
         move *= playerSpeed;
         if (move.magnitude > 0.05f) {
             gameObject.transform.forward = move;

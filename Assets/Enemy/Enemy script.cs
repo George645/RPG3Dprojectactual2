@@ -2,24 +2,28 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class EnemyScript : MonoBehaviour{
-    SphereCollider detectionSphere;
-    SphereCollider attackRangeSphere;
     public List<CapsuleCollider> inRangeList = new();
-    float health = 100;
-    int maxHealth;
+    [SerializeField] float health = 100;
+    float healingFactor = 0.1f;
+    float healingCooldown = 0f;
+    [SerializeField] int maxHealth;
     Vector3 target;
-    [SerializeField]Rigidbody rb;
+    Rigidbody rb;
     void Start() {
         rb = GetComponent<Rigidbody>();
-        detectionSphere = transform.GetChild(0).GetComponent<SphereCollider>();
-        attackRangeSphere = transform.GetChild(1).GetComponent<SphereCollider>();
+        maxHealth = (int)health;
     }
     void Death() {
         if (health <= 0) {
             Destroy(this.gameObject);
         }
     }
-    void Update(){
+    public void TakeDamage(float damage) {
+        health -= damage;
+        healingCooldown = 10f;
+    }
+    void Update() {
+        Death();
         if (inRangeList.Count > 1) {
             target = new Vector3(transform.position.x + 1000, transform.position.y, transform.position.z + 1000);
             foreach (Collider c in inRangeList) {
@@ -31,7 +35,7 @@ public class EnemyScript : MonoBehaviour{
                 }
             }
         }
-        else if (inRangeList.Count == 1){
+        else if (inRangeList.Count == 1) {
             try {
                 target = inRangeList[0].transform.position;
             }
@@ -40,7 +44,15 @@ public class EnemyScript : MonoBehaviour{
         else {
             target = this.transform.position;
         }
+    }
+    void FixedUpdate() {
+        healingCooldown -= Time.deltaTime;
+        if (health < maxHealth && healingCooldown < 0f) {
+            health += healingFactor;
+        }
+        else if (health > maxHealth) {
+            health = maxHealth;
+        }
         rb.AddForce((target - this.transform.position).normalized * Time.deltaTime * 300);
-        Debug.Log(inRangeList.Count);
     }
 }

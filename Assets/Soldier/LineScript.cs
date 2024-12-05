@@ -13,6 +13,7 @@ public class LineScript : MonoBehaviour
     Vector3 lineStartPosition, lineColumnDirection, lineRowDirection, movement, previousLineColumnDirection, previousLineRowDirection;
 
     void Start() {
+        DontDestroyOnLoad(this.transform.parent.gameObject);
         lr = GetComponent<LineRenderer>();
         unitWidth = (int)Math.Round(Vector3.Distance(lr.GetPosition(0), lr.GetPosition(1)), 1);
         unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(soldierMarkerList.Count), soldierMarkerList.Count / 3);
