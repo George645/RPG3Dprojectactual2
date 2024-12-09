@@ -8,11 +8,10 @@ public class SoldierScript : MonoBehaviour
     public Vector3 endPosition;
     public bool moving = true;
     bool start = true;
-    float health = 100;
+    [SerializeField]float health = 100;
     int maxHealth;
     float healingCooldown = 0f;
     float healingFactor = 0.2f;
-    float damage = 2f;
     private void Start(){
         maxHealth = (int)health;
         sm = this.transform.parent.GetChild(1).GetComponent<SoldierMarker>();
@@ -28,7 +27,6 @@ public class SoldierScript : MonoBehaviour
         health -= damage;
         healingCooldown = 10;
     }
-    // Update is called once per frame
     private void Update() {
         Death();
         //need something to run after start but before everything else, so used another variable that only lets it run once

@@ -4,22 +4,22 @@ using UnityEngine;
 
 public class Soldierattack : MonoBehaviour
 {
-
     SphereCollider attackRange;
     EnemyScript target;
-    List<EnemyScript> inRange = new();
+    [SerializeField] List<EnemyScript> inRange = new();
     Vector3 closest;
     float damage = 2f;
+    float counter = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
         attackRange = GetComponent<SphereCollider>();
         attackRange.isTrigger = true;
     }
     private void OnTriggerEnter(Collider other) {
-        if (other.GetComponent<PlayerAndSoldier>() != null) {
+        if (other.GetComponent<EnemyScript>() != null) {
             if (target == null) {
-                target = other.GetComponent<EnemyScript>();
-                AttackDelay(target);
+                target = other.transform.GetComponent<EnemyScript>();
+                Debug.Log("where is my attackdelay");
                 inRange.Add(target);
             }
             else {
@@ -28,7 +28,7 @@ public class Soldierattack : MonoBehaviour
         }
     }
     private void OnTriggerExit(Collider other) {
-        if (other.GetComponent<PlayerAndSoldier>() != null) {
+        if (other.GetComponent<EnemyScript>() != null) {
             inRange.Remove(other.GetComponent<EnemyScript>());
             closest = transform.position + new Vector3(100, 0, 100);
             foreach (EnemyScript enemy in inRange) {
@@ -40,19 +40,17 @@ public class Soldierattack : MonoBehaviour
             if (closest == transform.position + new Vector3(100, 0, 100)) {
                 target = null;
             }
-            else {
-                AttackDelay(target);
-            }
         }
     }
-
-    private IEnumerator AttackDelay(EnemyScript DealingDamage) {
-        while (DealingDamage != null) {
-            yield return new WaitForSeconds(3);
-            try {
-                DealingDamage.TakeDamage(damage);
+    private void FixedUpdate() {
+        if (target != null) {
+            if (counter <= 0) {
+                target.TakeDamage(damage);
+                counter = 3;
             }
-            catch { }
+            else {
+                counter -= Time.deltaTime;
+            }
         }
     }
 }

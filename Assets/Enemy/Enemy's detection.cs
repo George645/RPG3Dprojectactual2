@@ -24,7 +24,4 @@ public class detectionofenemyscript : MonoBehaviour{
             }
         }
     }
-    void Update(){
-        
-    }
 }

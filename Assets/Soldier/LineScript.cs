@@ -17,8 +17,10 @@ public class LineScript : MonoBehaviour
         lr = GetComponent<LineRenderer>();
         unitWidth = (int)Math.Round(Vector3.Distance(lr.GetPosition(0), lr.GetPosition(1)), 1);
         unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(soldierMarkerList.Count), soldierMarkerList.Count / 3);
-        lineStartPosition = lr.GetPosition(0); //between this line and the lines below it, we get where the line starts (this line), then it finds the direction of the rows (the next line) then it gets the direction of the columns. 
         lineRowDirection = lr.GetPosition(1) - lr.GetPosition(0); // Using these, we can multiply the position in the row (i) by the 
+        lr.SetPosition(0, transform.parent.transform.position - lineRowDirection/2);
+        lr.SetPosition(1, transform.parent.transform.position + lineRowDirection/2);
+        lineStartPosition = lr.GetPosition(0); //between this line and the lines below it, we get where the line starts (this line), then it finds the direction of the rows (the next line) then it gets the direction of the columns. 
         lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
         foreach (SoldierMarker soldierMarker in soldierMarkerList) {
             soldierMarker.marking = true;

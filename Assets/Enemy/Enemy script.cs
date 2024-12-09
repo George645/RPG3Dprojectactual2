@@ -6,7 +6,7 @@ public class EnemyScript : MonoBehaviour{
     [SerializeField] float health = 100;
     float healingFactor = 0.1f;
     float healingCooldown = 0f;
-    [SerializeField] int maxHealth;
+    int maxHealth;
     Vector3 target;
     Rigidbody rb;
     void Start() {
@@ -29,9 +29,6 @@ public class EnemyScript : MonoBehaviour{
             foreach (Collider c in inRangeList) {
                 if ((this.transform.position - c.transform.position).magnitude < (this.transform.position - target).magnitude) {
                     target = c.transform.position;
-                    Debug.Log(c.name);
-                    Debug.Log(inRangeList[0].name);
-                    Debug.Log(inRangeList[1].name);
                 }
             }
         }

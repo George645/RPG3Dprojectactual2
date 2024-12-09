@@ -8,25 +8,24 @@ public class Player : MonoBehaviour {
     public Camera followingCamera;
     
     private float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
-    [SerializeField] int speed = 5;
+    int speed = 5;
+    
     LineScript ol;
     LineRenderer lr;
     Vector3 mousePosStart, mousePosEnd;
     int unitWidth, mask, previousUnitWidth = 10;
 
-    float health = 100;
     int maxHealth;
-    float healingCooldown = 0f;
-    float healingFactor = 0.2f;
+    float healingCooldown = 0f, healingFactor = 0.2f;
+    [SerializeField] float health = 100;
 
     double rotation;
-    double startZ = 10f;
-    double startX = 0f;
     Vector3 startMousePosition;
 
     public static Player instance;
 
     private void Start() {
+        maxHealth = (int)health;
         if (instance == null) {
             DontDestroyOnLoad(this.gameObject);
             instance = this;
@@ -38,11 +37,13 @@ public class Player : MonoBehaviour {
     }
     private void CheckIfClickingOnUnit() {
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit) && hit.transform.name.Contains("Soldier")) {
+        Debug.Log("checking");
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000, LayerMask.GetMask("SoldierLayer")) && hit.transform.name.Contains("Soldier")) {
             ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
             ol.selected = true;
             previousUnitWidth = ol.unitWidth;
             lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
+            Debug.Log(ol.transform.parent.name);
         }
         else {
             if (ol != null) {
@@ -153,7 +154,7 @@ public class Player : MonoBehaviour {
         }
         verticalVelocity -= gravityValue * Time.deltaTime;
 
-        Vector3 move = new Vector3((followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Vertical") + (followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Horizontal"), 0, (followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Vertical") + (followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Horizontal"));
+        Vector3 move = new Vector3(-(followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Vertical") + -(followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Horizontal"), 0, -(followingCamera.transform.position.z - transform.position.z) * Input.GetAxis("Vertical") + (followingCamera.transform.position.x - transform.position.x) * Input.GetAxis("Horizontal"));
         move = move.normalized;
         move *= playerSpeed;
         if (move.magnitude > 0.05f) {

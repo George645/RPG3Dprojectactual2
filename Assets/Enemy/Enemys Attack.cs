@@ -1,14 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class EnemysAttack : MonoBehaviour{
     SphereCollider attackRange;
     PlayerAndSoldier target;
-    List<PlayerAndSoldier> inRange = new();
+    [SerializeField]List<PlayerAndSoldier> inRange = new();
     Vector3 closest;
     float damage = 2f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    float counter = 0;
     void Start(){
         attackRange = GetComponent<SphereCollider>();
         attackRange.isTrigger = true;
@@ -17,7 +18,6 @@ public class EnemysAttack : MonoBehaviour{
         if (other.GetComponent<PlayerAndSoldier>() != null) {
             if (target == null) {
                 target = other.GetComponent<PlayerAndSoldier>();
-                AttackDelay(target);
             }
             inRange.Add(target.GetComponent<PlayerAndSoldier>());
         }
@@ -35,26 +35,23 @@ public class EnemysAttack : MonoBehaviour{
             if (closest == transform.position + new Vector3(100, 0, 100)) {
                 target = null;
             }
+        }
+    }
+    private void FixedUpdate() {
+        if (target != null) {
+            if (counter <= 0) {
+                Debug.Log(target);
+                try {
+                    target.GetComponent<SoldierScript>().TakeDamage(damage);
+                }
+                catch {
+                    target.GetComponent<Player>().TakeDamage(damage);
+                }
+                counter = 3;
+            }
             else {
-                AttackDelay(target);
+                counter -= Time.deltaTime;
             }
         }
-    }
-
-    private IEnumerator AttackDelay(PlayerAndSoldier DealingDamage) {
-        while (DealingDamage != null) {
-            yield return new WaitForSeconds(3);
-            try {
-                DealingDamage.transform.GetComponent<SoldierScript>().TakeDamage(damage);
-            }
-            catch {
-                DealingDamage.transform.GetComponent<Player>().TakeDamage(damage);
-            }
-        }
-    }
-
-    void Update()
-    {
-        
     }
 }
