@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System;
 using UnityEditor.PackageManager;
 
-public class LineScript : MonoBehaviour
-{
+public class LineScript : MonoBehaviour{
     public List<SoldierMarker> soldierMarkerList = new();
     public bool selected = false;
     public int unitWidth = 10;
     int rowNumber = 0, columnNumber = 0, previousUnitWidth;
     LineRenderer lr;
-    Vector3 lineStartPosition, lineColumnDirection, lineRowDirection, movement, previousLineColumnDirection, previousLineRowDirection;
+    public Vector3 previousLineColumnDirection;
+    Vector3 lineStartPosition, lineRowDirection, movement, lineColumnDirection, previousLineRowDirection;
 
     void Start() {
         DontDestroyOnLoad(this.transform.parent.gameObject);
@@ -45,11 +45,14 @@ public class LineScript : MonoBehaviour
             soldierMarkerList.Remove(soldier);
         }
         else {
-            throw new MissingComponentException("There was no soldier found in this unit");
+            //throw new MissingComponentException("There was no soldier found in this unit");
 
         }
     }
     private void Update() {
+        if(soldierMarkerList.Count == 0) {
+            Destroy(this.transform.parent.gameObject);
+        }
         lineStartPosition = lr.GetPosition(0);
         lineRowDirection = lr.GetPosition(1) - lr.GetPosition(0);
         if ((int)Math.Round(Vector3.Distance(lr.GetPosition(0), lr.GetPosition(1)), 1) < soldierMarkerList.Count / 30 + 2) {
@@ -62,14 +65,17 @@ public class LineScript : MonoBehaviour
             previousLineColumnDirection = lineColumnDirection;
             previousLineRowDirection = lineRowDirection;
             previousUnitWidth = unitWidth;
+            Debug.Log(lineColumnDirection + " " + transform.parent.name);
         }
     }
-    void FixedUpdate() {
-        rowNumber = 0;
-        columnNumber = 0;
-        lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
-        if (Input.GetMouseButton(1) && selected) {
-            foreach (SoldierMarker soldierMarker in soldierMarkerList) {
+    void ForLoop() {
+        foreach (SoldierMarker soldierMarker in soldierMarkerList) {
+            if (soldierMarker == null) {
+                soldierMarkerList.Remove(soldierMarker);
+                ForLoop();
+                break;
+            }
+            else {
                 soldierMarker.marking = true;
                 Math.DivRem(columnNumber, 2, out int ColumnNumberDivRemainder);
                 movement = new Vector3(lineStartPosition.x + lineRowDirection.normalized.x * rowNumber + lineColumnDirection.normalized.x * columnNumber + lineRowDirection.normalized.x * 0.5f * ColumnNumberDivRemainder, 19.1f, lineStartPosition.z + lineRowDirection.normalized.z * rowNumber + lineColumnDirection.normalized.z * columnNumber + lineRowDirection.normalized.z * ColumnNumberDivRemainder * 0.5f);
@@ -80,6 +86,14 @@ public class LineScript : MonoBehaviour
                     rowNumber = 0;
                 }
             }
+        }
+    }
+    void FixedUpdate() {
+        rowNumber = 0;
+        columnNumber = 0;
+        lineColumnDirection = new Vector3(lineRowDirection.z * 1, lineRowDirection.y * 1, lineRowDirection.x * -1);
+        if (Input.GetMouseButton(1) && selected) {
+            ForLoop();
         }
         if (Input.GetMouseButtonUp(1) && selected) {
             foreach (SoldierMarker soldierMarker in soldierMarkerList) {

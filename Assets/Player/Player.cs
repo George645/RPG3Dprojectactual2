@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
     public Camera followingCamera;
     
     private float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
-    int speed = 5;
+    [SerializeField]int speed = 5;
     
     LineScript ol;
     LineRenderer lr;
@@ -37,24 +37,34 @@ public class Player : MonoBehaviour {
     }
     private void CheckIfClickingOnUnit() {
         RaycastHit hit;
-        Debug.Log("checking");
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 10000, LayerMask.GetMask("SoldierLayer")) && hit.transform.name.Contains("Soldier")) {
+            if (ol != null) {
+                ol.selected = false;
+            }
             ol = hit.transform.parent.parent.GetChild(0).GetComponent<LineScript>();
             ol.selected = true;
             previousUnitWidth = ol.unitWidth;
             lr = hit.transform.parent.parent.GetChild(0).GetComponent<LineRenderer>();
-            Debug.Log(ol.transform.parent.name);
         }
         else {
             if (ol != null) {
-                foreach (SoldierMarker sm in ol.soldierMarkerList) {
-                    sm.marking = false;
-                    sm.transform.position = new Vector3(sm.stm.endPosition.x, 19, sm.stm.endPosition.z);
-                }
+                SetMarkingFalse();
                 ol.selected = false;
                 ol = null;
                 lr = null;
             }
+        }
+    }
+    void SetMarkingFalse() {
+
+        foreach (SoldierMarker sm in ol.soldierMarkerList) {
+            if (sm == null) {
+                ol.soldierMarkerList.Remove(sm);
+                SetMarkingFalse();
+                break;
+            }
+            sm.marking = false;
+            sm.transform.position = new Vector3(sm.stm.endPosition.x, 19, sm.stm.endPosition.z);
         }
     }
     private void GetUnitWidth() {
@@ -63,11 +73,21 @@ public class Player : MonoBehaviour {
             unitWidth = previousUnitWidth;
         }
         else {
-            unitWidth = Math.Clamp(unitWidth, 3, ol.soldierMarkerList.Count / 3);
+            try {
+                unitWidth = Math.Clamp(unitWidth, 3, ol.soldierMarkerList.Count / 3);
+            }
+            catch {
+                unitWidth = 1;
+            }
         }
     }
     private void ShowMarkers(bool setTo) {
         foreach (SoldierMarker soldierMarker in ol.soldierMarkerList) {
+            if (soldierMarker == null) {
+                ol.soldierMarkerList.Remove(soldierMarker);
+                ShowMarkers(setTo);
+                break;
+            }
             soldierMarker.GetComponent<MeshRenderer>().enabled = setTo;
             soldierMarker.marking = setTo;
         }

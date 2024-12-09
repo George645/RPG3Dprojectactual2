@@ -22,16 +22,24 @@ public class EnemysAttack : MonoBehaviour{
             inRange.Add(target.GetComponent<PlayerAndSoldier>());
         }
     }
+    void TheForLoop() {
+        foreach (PlayerAndSoldier friendly in inRange) {
+            if (friendly == null) {
+                inRange.Remove(friendly);
+                TheForLoop();
+                break;
+            }
+            if ((friendly.transform.position - transform.position).magnitude < (closest - transform.position).magnitude) {
+                closest = friendly.transform.position;
+                target = friendly.GetComponent<PlayerAndSoldier>();
+            }
+        }
+    }
     private void OnTriggerExit(Collider other) {
         if (other.GetComponent<PlayerAndSoldier>() != null) {
             inRange.Remove(other.GetComponent<PlayerAndSoldier>());
             closest = transform.position + new Vector3(100, 0, 100);
-            foreach (PlayerAndSoldier friendly in inRange) {
-                if ((friendly.transform.position - transform.position).magnitude < (closest - transform.position).magnitude) {
-                    closest = friendly.transform.position;
-                    target = friendly.GetComponent<PlayerAndSoldier>();
-                }
-            }
+            TheForLoop();
             if (closest == transform.position + new Vector3(100, 0, 100)) {
                 target = null;
             }
@@ -40,7 +48,6 @@ public class EnemysAttack : MonoBehaviour{
     private void FixedUpdate() {
         if (target != null) {
             if (counter <= 0) {
-                Debug.Log(target);
                 try {
                     target.GetComponent<SoldierScript>().TakeDamage(damage);
                 }

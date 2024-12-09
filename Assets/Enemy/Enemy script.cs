@@ -1,16 +1,24 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AI;
+using System.Threading;
 
 public class EnemyScript : MonoBehaviour{
-    public List<CapsuleCollider> inRangeList = new();
+    public CapsuleCollider chasing = null;
     [SerializeField] float health = 100;
     float healingFactor = 0.1f;
     float healingCooldown = 0f;
     int maxHealth;
-    Vector3 target;
-    Rigidbody rb;
+    public Vector3 target;
+    NavMeshAgent agent;
+    public static List<PlayerAndSoldier> list;
     void Start() {
-        rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        if (list == null || list.Count == 0) {
+            list = new(FindObjectsByType<PlayerAndSoldier>(FindObjectsSortMode.None));
+            Debug.Log("should only run once");
+        }
+        chasing = list[(int)Random.Range(0, list.Count)].GetComponent<CapsuleCollider>();
         maxHealth = (int)health;
     }
     void Death() {
@@ -23,26 +31,23 @@ public class EnemyScript : MonoBehaviour{
         healingCooldown = 10f;
     }
     void Update() {
-        Death();
-        if (inRangeList.Count > 1) {
-            target = new Vector3(transform.position.x + 1000, transform.position.y, transform.position.z + 1000);
-            foreach (Collider c in inRangeList) {
-                if ((this.transform.position - c.transform.position).magnitude < (this.transform.position - target).magnitude) {
-                    target = c.transform.position;
-                }
-            }
-        }
-        else if (inRangeList.Count == 1) {
+        if (chasing != null) {
             try {
-                target = inRangeList[0].transform.position;
+                target = chasing.transform.position;
             }
-            catch { }
+            catch { Debug.Log("error in line 36 enemyscript"); }
         }
         else {
             target = this.transform.position;
+            if (list == null || list.Count == 0) {
+                list = new(FindObjectsByType<PlayerAndSoldier>(FindObjectsSortMode.None));
+            }
+            chasing = list[(int)Random.Range(0, list.Count)].GetComponent<CapsuleCollider>();
         }
+        Death();
     }
     void FixedUpdate() {
+        list = new();
         healingCooldown -= Time.deltaTime;
         if (health < maxHealth && healingCooldown < 0f) {
             health += healingFactor;
@@ -50,6 +55,6 @@ public class EnemyScript : MonoBehaviour{
         else if (health > maxHealth) {
             health = maxHealth;
         }
-        rb.AddForce((target - this.transform.position).normalized * Time.deltaTime * 300);
+        agent.SetDestination(target);
     }
 }
