@@ -37,6 +37,8 @@ public class SoldierScript : MonoBehaviour
         }
         if (moving) {
             endPosition = sm.transform.position;
+            endPosition.x -= 0.2f;
+            endPosition.z -= 0.2f;
         }
     }
     void FixedUpdate(){

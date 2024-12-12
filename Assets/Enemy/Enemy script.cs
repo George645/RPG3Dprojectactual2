@@ -55,6 +55,8 @@ public class EnemyScript : MonoBehaviour{
         else if (health > maxHealth) {
             health = maxHealth;
         }
-        agent.SetDestination(target);
+        if (agent.destination != target) {
+            agent.SetDestination(target);
+        }
     }
 }

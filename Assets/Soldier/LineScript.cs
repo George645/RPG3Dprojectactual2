@@ -9,7 +9,7 @@ public class LineScript : MonoBehaviour{
     public int unitWidth = 10;
     int rowNumber = 0, columnNumber = 0, previousUnitWidth;
     LineRenderer lr;
-    public Vector3 previousLineColumnDirection;
+    Vector3 previousLineColumnDirection;
     Vector3 lineStartPosition, lineRowDirection, movement, lineColumnDirection, previousLineRowDirection;
 
     void Start() {
@@ -65,7 +65,6 @@ public class LineScript : MonoBehaviour{
             previousLineColumnDirection = lineColumnDirection;
             previousLineRowDirection = lineRowDirection;
             previousUnitWidth = unitWidth;
-            Debug.Log(lineColumnDirection + " " + transform.parent.name);
         }
     }
     void ForLoop() {

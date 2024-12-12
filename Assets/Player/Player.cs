@@ -4,11 +4,11 @@ using UnityEngine;
 
 
 public class Player : MonoBehaviour {
-    public CharacterController controller;
-    public Camera followingCamera;
+    CharacterController controller;
+    Camera followingCamera;
     
-    private float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
-    [SerializeField]int speed = 5;
+    float verticalVelocity, groundedTimer, playerSpeed = 2.0f, jumpHeight = 1.0f, gravityValue = 9.81f;
+    int speed = 5;
     
     LineScript ol;
     LineRenderer lr;
@@ -17,9 +17,10 @@ public class Player : MonoBehaviour {
 
     int maxHealth;
     float healingCooldown = 0f, healingFactor = 0.2f;
-    [SerializeField] float health = 100;
+    float health = 100;
+    public int MaxHealth { get { return maxHealth; } }
+    public float Health { get { return health; } }
 
-    double rotation;
     Vector3 startMousePosition;
 
     public static Player instance;
@@ -34,6 +35,7 @@ public class Player : MonoBehaviour {
             Destroy(this.gameObject);
         }
         controller = gameObject.GetComponent<CharacterController>();
+        followingCamera = FindAnyObjectByType<Camera>();
     }
     private void CheckIfClickingOnUnit() {
         RaycastHit hit;
@@ -103,13 +105,6 @@ public class Player : MonoBehaviour {
     }
     private void Update() {
         Death();
-        if (Input.GetMouseButtonDown(2)) {
-            startMousePosition = Input.mousePosition;
-        }
-        if (Input.GetMouseButton(2)) {
-            rotation = (Input.mousePosition.x - startMousePosition.x) / 10;
-            startMousePosition = Input.mousePosition;
-        }
         if (Input.GetButtonDown("Jump") && groundedTimer > 0) {
             groundedTimer = 0;
             verticalVelocity += Mathf.Sqrt(jumpHeight * 2 * gravityValue);

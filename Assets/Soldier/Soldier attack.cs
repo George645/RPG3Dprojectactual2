@@ -1,79 +1,81 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Soldierattack : MonoBehaviour
 {
     SphereCollider attackRange;
     EnemyScript target;
-    [SerializeField] List<EnemyScript> inRange = new();
+    [SerializeField] List<Collider> inRange = new();
     Vector3 closest;
     float damage = 10f;
     float counter = 0;
     void Start() {
         attackRange = GetComponent<SphereCollider>();
         attackRange.isTrigger = true;
+        counter = Random.value * 3;
     }
     private void OnTriggerEnter(Collider other) {
         if (other.GetComponent<EnemyScript>() != null) {
-            if (target == null) {
-                target = other.transform.GetComponent<EnemyScript>();
-                inRange.Add(target);
-            }
-            else {
-                inRange.Add(other.GetComponent<EnemyScript>());
-            }
+            target = other.GetComponent<EnemyScript>();
+            attackRange.enabled = false;
         }
     }
-    private void theForLoop() {
-        foreach (EnemyScript enemy in inRange) {
+    void TheForLoop() {
+        foreach (Collider enemy in inRange) {
             if (enemy == null) {
                 inRange.Remove(enemy);
-                theForLoop();
+                TheForLoop();
                 break;
             }
+            closest = new Vector3(transform.position.x + 100, 19, transform.position.z + 100);
             if ((enemy.transform.position - transform.position).magnitude < (closest - transform.position).magnitude) {
                 closest = enemy.transform.position;
-                target = enemy;
+                target = enemy.GetComponent<EnemyScript>();
             }
+
         }
     }
-    private void OnTriggerExit(Collider other) {
+    private void OnTriggerStay(Collider other) {
         if (other.GetComponent<EnemyScript>() != null) {
-            inRange.Remove(other.GetComponent<EnemyScript>());
-            closest = transform.position + new Vector3(100, 0, 100);
-            try {
-                theForLoop();
+            if (inRange.Contains(other)) {
+                TheForLoop();
             }
-            catch (MissingReferenceException e) {
-                Debug.Log(e);
-            }
-            if (closest == transform.position + new Vector3(100, 0, 100)) {
-                target = null;
+            else {
+                inRange.Add(other);
             }
         }
     }
     private void FixedUpdate() {
-        if (target != null) {
-            var lookPos = target.transform.position - transform.parent.position;
-            lookPos = new Vector3(-lookPos.x, 0, -lookPos.z);
-            lookPos.y = 0;
-            var rotation = Quaternion.LookRotation(lookPos);
-            transform.parent.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 2);
+        if (target != null && (target.transform.position - transform.position).magnitude < attackRange.radius) {
             if (counter <= 0) {
-                target.TakeDamage(damage);
+                Debug.Log("deal damage");
+                try {
+                    target.GetComponent<SoldierScript>().TakeDamage(damage);
+                }
+                catch {
+                    if (target.GetComponent<Player>() != null) {
+                        target.GetComponent<Player>().TakeDamage(damage);
+                    }
+                }
                 counter = 3;
             }
             else {
                 counter -= Time.deltaTime;
             }
         }
-        else{
-            var lookPos = transform.parent.parent.parent.GetChild(0).GetComponent<LineScript>().previousLineColumnDirection;
-            var rotation = Quaternion.LookRotation(lookPos);
-            transform.parent.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 2);
+        else {
+            if (counter == -1) {
+                attackRange.enabled = true;
+                counter = 1;
+            }
+            if (counter <= 0) {
+                attackRange.enabled = true;
+                counter = -1;
+            }
+            else {
+                attackRange.enabled = false;
+                counter -= Time.deltaTime;
+            }
         }
     }
 }
