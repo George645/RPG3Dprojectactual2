@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
 using System.Threading;
+using Unity.VisualScripting;
 
 public class EnemyScript : MonoBehaviour{
     public CapsuleCollider chasing = null;
@@ -11,12 +12,20 @@ public class EnemyScript : MonoBehaviour{
     int maxHealth;
     public Vector3 target;
     NavMeshAgent agent;
+    bool canExitLoop = true;
     public static List<PlayerAndSoldier> list;
     void Start() {
+        do {
+            this.transform.position = new Vector3(Random.value * 1000, 20f, Random.value * 1000);
+            canExitLoop = true;
+            foreach (Transform location in Player.startingPositions) {
+                canExitLoop = ((location.position - transform.position).sqrMagnitude < 10000);
+            }
+        } while (canExitLoop);
+
         agent = GetComponent<NavMeshAgent>();
         if (list == null || list.Count == 0) {
             list = new(FindObjectsByType<PlayerAndSoldier>(FindObjectsSortMode.None));
-            Debug.Log("should only run once");
         }
         chasing = list[(int)Random.Range(0, list.Count)].GetComponent<CapsuleCollider>();
         maxHealth = (int)health;
@@ -53,7 +62,7 @@ public class EnemyScript : MonoBehaviour{
             health += healingFactor;
         }
         else if (health > maxHealth) {
-            health = maxHealth;
+            //health = maxHealth;
         }
         if (agent.destination != target) {
             agent.SetDestination(target);

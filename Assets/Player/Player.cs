@@ -1,5 +1,5 @@
 using System;
-using Unity.Cinemachine;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -24,7 +24,16 @@ public class Player : MonoBehaviour {
     Vector3 startMousePosition;
 
     public static Player instance;
-
+    public static List<Transform> startingPositions;
+    private void Awake() {
+        if (startingPositions == null) { 
+            startingPositions = new();
+            startingPositions.Add(this.transform);
+            foreach (LineRenderer line in FindObjectsByType<LineRenderer>(FindObjectsSortMode.None)) {
+                startingPositions.Add(line.transform);
+            }
+        }
+    }
     private void Start() {
         maxHealth = (int)health;
         if (instance == null) {

@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class SoldierScript : MonoBehaviour
-{
+public class SoldierScript : MonoBehaviour { 
     SoldierMarker sm;
+    Soldierattack soldierAttack;
     Vector3 movement;
     public Vector3 endPosition;
     public bool moving = true;
@@ -12,7 +12,16 @@ public class SoldierScript : MonoBehaviour
     int maxHealth;
     float healingCooldown = 0f;
     float healingFactor = 0.2f;
+    Animator anim;
+    public enum SoldierState {
+        idle = 0,
+        moving = 1,
+        attacking = 2
+    }
+    public SoldierState soldierstate = SoldierState.idle;
     private void Start(){
+        soldierAttack = transform.GetChild(2).GetComponent<Soldierattack>();
+        anim = transform.GetChild(0).GetComponent<Animator>();
         maxHealth = (int)health;
         sm = this.transform.parent.GetChild(1).GetComponent<SoldierMarker>();
         endPosition = sm.transform.position;
@@ -39,7 +48,15 @@ public class SoldierScript : MonoBehaviour
             endPosition = sm.transform.position;
             endPosition.x -= 0.2f;
             endPosition.z -= 0.2f;
+            soldierstate = SoldierState.moving;
         }
+        else if (soldierAttack.foundEnemy) {
+            soldierstate = SoldierState.attacking;
+        }
+        else {
+            soldierstate = SoldierState.idle;
+        }
+        anim.SetInteger("Which is it", (int)soldierstate);
     }
     void FixedUpdate(){
         healingCooldown -= Time.deltaTime;

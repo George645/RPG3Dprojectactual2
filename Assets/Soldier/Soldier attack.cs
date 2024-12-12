@@ -9,6 +9,7 @@ public class Soldierattack : MonoBehaviour
     Vector3 closest;
     float damage = 10f;
     float counter = 0;
+    public bool foundEnemy = false;
     void Start() {
         attackRange = GetComponent<SphereCollider>();
         attackRange.isTrigger = true;
@@ -47,23 +48,24 @@ public class Soldierattack : MonoBehaviour
     }
     private void FixedUpdate() {
         if (target != null && (target.transform.position - transform.position).magnitude < attackRange.radius) {
+            var lookPos = target.transform.position - transform.parent.position;
+            lookPos = new Vector3(-lookPos.x, 0, -lookPos.z);
+            var rotation = Quaternion.LookRotation(lookPos);
+            transform.parent.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime);
             if (counter <= 0) {
-                Debug.Log("deal damage");
-                try {
-                    target.GetComponent<SoldierScript>().TakeDamage(damage);
-                }
-                catch {
-                    if (target.GetComponent<Player>() != null) {
-                        target.GetComponent<Player>().TakeDamage(damage);
-                    }
-                }
+                target.GetComponent<EnemyScript>().TakeDamage(damage);
                 counter = 3;
             }
             else {
                 counter -= Time.deltaTime;
             }
+            foundEnemy = true;
         }
         else {
+            var lookPos = transform.parent.parent.parent.GetChild(0).GetComponent<LineScript>().previousLineColumnDirection;
+            lookPos = new Vector3(-lookPos.x, 0, -lookPos.z);
+            var rotation = Quaternion.LookRotation(lookPos);
+            transform.parent.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 2);
             if (counter == -1) {
                 attackRange.enabled = true;
                 counter = 1;
@@ -76,6 +78,7 @@ public class Soldierattack : MonoBehaviour
                 attackRange.enabled = false;
                 counter -= Time.deltaTime;
             }
+            foundEnemy = false;
         }
     }
 }

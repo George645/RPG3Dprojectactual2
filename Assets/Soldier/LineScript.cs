@@ -9,11 +9,10 @@ public class LineScript : MonoBehaviour{
     public int unitWidth = 10;
     int rowNumber = 0, columnNumber = 0, previousUnitWidth;
     LineRenderer lr;
-    Vector3 previousLineColumnDirection;
-    Vector3 lineStartPosition, lineRowDirection, movement, lineColumnDirection, previousLineRowDirection;
+    public Vector3 previousLineColumnDirection, previousLineRowDirection;
+    Vector3 lineStartPosition, lineRowDirection, movement, lineColumnDirection;
 
     void Start() {
-        DontDestroyOnLoad(this.transform.parent.gameObject);
         lr = GetComponent<LineRenderer>();
         unitWidth = (int)Math.Round(Vector3.Distance(lr.GetPosition(0), lr.GetPosition(1)), 1);
         unitWidth = Math.Clamp(unitWidth, (int)Math.Sqrt(soldierMarkerList.Count), soldierMarkerList.Count / 3);

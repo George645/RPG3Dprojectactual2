@@ -15,6 +15,9 @@ public class SoldierMarker : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Z)) {
             GetComponent<MeshRenderer>().enabled = true;
         }
+        else if (Input.GetKey(KeyCode.Z)) {
+            GetComponent<MeshRenderer>().enabled = true;
+        }
         else if (Input.GetKeyUp(KeyCode.Z)) {
             GetComponent<MeshRenderer>().enabled = false;
         }
