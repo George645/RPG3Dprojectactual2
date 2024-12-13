@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 using UnityEngine;
 
 public class SoldierSpawner : MonoBehaviour{

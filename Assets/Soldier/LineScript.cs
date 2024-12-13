@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using UnityEditor.PackageManager;
 
 public class LineScript : MonoBehaviour{
     public List<SoldierMarker> soldierMarkerList = new();

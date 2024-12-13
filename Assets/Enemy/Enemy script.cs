@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
-using System.Threading;
-using Unity.VisualScripting;
 
 public class EnemyScript : MonoBehaviour{
     public CapsuleCollider chasing = null;
@@ -22,7 +20,6 @@ public class EnemyScript : MonoBehaviour{
                 canExitLoop = ((location.transform.position - transform.position).sqrMagnitude < 10000);
             }
         } while (canExitLoop);
-
         agent = GetComponent<NavMeshAgent>();
         if (list == null || list.Count == 0) {
             list = new(FindObjectsByType<PlayerAndSoldier>(FindObjectsSortMode.None));
@@ -69,7 +66,7 @@ public class EnemyScript : MonoBehaviour{
             health += healingFactor;
         }
         else if (health > maxHealth) {
-            //health = maxHealth;
+            health = maxHealth;
         }
         if (agent.destination != target) {
             agent.SetDestination(target);
