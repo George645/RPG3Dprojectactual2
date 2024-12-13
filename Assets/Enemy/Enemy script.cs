@@ -16,10 +16,10 @@ public class EnemyScript : MonoBehaviour{
     public static List<PlayerAndSoldier> list;
     void Start() {
         do {
-            this.transform.position = new Vector3(Random.value * 1000, 20f, Random.value * 1000);
+            transform.position = new Vector3(Random.value * 1000, 20f, Random.value * 1000);
             canExitLoop = true;
-            foreach (Transform location in Player.startingPositions) {
-                canExitLoop = ((location.position - transform.position).sqrMagnitude < 10000);
+            foreach (GameObject location in Player.startingPositions) {
+                canExitLoop = ((location.transform.position - transform.position).sqrMagnitude < 10000);
             }
         } while (canExitLoop);
 
@@ -32,7 +32,14 @@ public class EnemyScript : MonoBehaviour{
     }
     void Death() {
         if (health <= 0) {
-            Destroy(this.gameObject);
+            do {
+                transform.position = new Vector3(Random.value * 1000, 20f, Random.value * 1000);
+                canExitLoop = true;
+                foreach (GameObject location in Player.startingPositions) {
+                    canExitLoop = ((location.transform.position - transform.position).sqrMagnitude < 10000);
+                }
+            } while (canExitLoop);
+            health = 100;
         }
     }
     public void TakeDamage(float damage) {

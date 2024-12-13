@@ -53,11 +53,14 @@ public class EnemysAttack : MonoBehaviour{
         if (target != null && (target.transform.position - transform.position).magnitude < attackRange.radius) {
             if (counter <= 0) {
                 Debug.Log("deal damage");
-                if (target.GetComponent<Soldierattack>() != null) { 
+                if (target.GetComponent<SoldierScript>() != null) {
                     target.GetComponent<SoldierScript>().TakeDamage(damage);
                 }
                 else if (target.GetComponent<Player>() != null) {
                     target.GetComponent<Player>().TakeDamage(damage);
+                }
+                else if (target.GetComponent<SoldierSpawner>() != null) {
+                    target.GetComponent<SoldierSpawner>().TakeDamage(damage);
                 }
                 counter = 3;
             }

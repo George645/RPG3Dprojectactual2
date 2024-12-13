@@ -44,8 +44,7 @@ public class LineScript : MonoBehaviour{
             soldierMarkerList.Remove(soldier);
         }
         else {
-            //throw new MissingComponentException("There was no soldier found in this unit");
-
+            Debug.Log(soldier + " was not found in unit " + transform.parent.name);
         }
     }
     private void Update() {

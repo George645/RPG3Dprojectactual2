@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class Player : MonoBehaviour {
@@ -24,13 +25,13 @@ public class Player : MonoBehaviour {
     Vector3 startMousePosition;
 
     public static Player instance;
-    public static List<Transform> startingPositions;
+    public static List<GameObject> startingPositions;
     private void Awake() {
         if (startingPositions == null) { 
             startingPositions = new();
-            startingPositions.Add(this.transform);
+            startingPositions.Add(transform.gameObject);
             foreach (LineRenderer line in FindObjectsByType<LineRenderer>(FindObjectsSortMode.None)) {
-                startingPositions.Add(line.transform);
+                startingPositions.Add(line.gameObject);
             }
         }
     }
@@ -106,6 +107,7 @@ public class Player : MonoBehaviour {
     private void Death() {
         if (health < 0) {
             Destroy(this.gameObject);
+            SceneManager.LoadScene("Death");
         }
     }
     public void TakeDamage(float damage) {

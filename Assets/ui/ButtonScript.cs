@@ -10,8 +10,11 @@ public class ButtonScript : MonoBehaviour{
     }
     public void LeaveGame() {
         Time.timeScale = 1;
-        /*TEMP*/transform.parent.parent.GetComponent<Canvas>().enabled = false;
-        //SceneManager.LoadScene("Main Menu"); < actual thing
+        SceneManager.LoadScene("Main Menu");
+        try {
+            Destroy(FindAnyObjectByType<Player>());
+        }
+        catch { }
     }
     public void StartGame() {
         Time.timeScale = 1;
