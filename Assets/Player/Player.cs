@@ -21,9 +21,7 @@ public class Player : MonoBehaviour {
     float health = 100;
     public int MaxHealth { get { return maxHealth; } }
     public float Health { get { return health; } }
-
     Vector3 startMousePosition;
-
     public static Player instance;
     public static List<GameObject> startingPositions;
     private void Awake() {
